@@ -18,9 +18,24 @@ class note:
         self.vel = vel
     def __str__(self):
         return f"note {self.n} length {self.length} time {self.time} channel {self.channel}"
+    def __eq__(self, obj):
+        return obj.n == self.n
+    def __ne__(self, obj):
+        return not self == obj
 class song:
     notes = []
     ticks_per_beat = 0
+    def C(self):
+        results = []
+        for x in self.notes:
+            not_in = True
+            for r in results:
+                 if r == x:
+                    not_in = False
+                    break
+            if not_in:
+                results.append(x)
+        return len(results)
     def from_midi_track(self, track,ticks_per_beat):
         self.notes = []
         self.ticks_per_beat = ticks_per_beat
@@ -90,6 +105,17 @@ sng = song()
 mid2 = MidiFile()
 mid2.ticks_per_beat = mid.ticks_per_beat
 
+def d(x, y):
+    xy = song()
+    xy.notes.extend(x.notes)
+    xy.notes.extend(y.notes)
+    return ( 
+        (xy.C() + min(x.C(), y.C()))/
+                max(x.C(), y.C())
+                )
+    
+
+
 for i,t in enumerate(mid.tracks):
     
     sng.from_midi_track(t, mid.ticks_per_beat)
@@ -99,7 +125,7 @@ for i,t in enumerate(mid.tracks):
     b = 0
     
         
-print(len(mid2.tracks))
+    print(len(sng.notes), sng.C())
 mid2.save("wii2.mid")
 
 
